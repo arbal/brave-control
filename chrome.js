@@ -101,7 +101,7 @@ function list() {
     chrome.windows().forEach((window, winIdx) => {
         window.tabs().forEach((tab, tabIdx) => {
             urlToTitle[tab.url()] = {
-                'title': tab.title() || 'No Title',
+                'title': tab.title() + " " + tab.url().split(/[\.\/\-_]/).filter(s=> s && ! /https?:/.test(s)).join(' '),
                 'url': tab.url(),
                 'winIdx': winIdx,
                 'tabIdx': tabIdx,
