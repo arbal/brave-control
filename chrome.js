@@ -83,6 +83,10 @@ function chromeControl(argv) {
         if (argv.length !== 2) { usage() }
         const arg = argv[1]
         focus(arg)
+    } else if (cmd === 'bookmarks') {
+        bookmarks()
+    } else if (cmd === 'open') {
+        open(argv[1])
     } else {
         usage()
     }
@@ -94,6 +98,62 @@ function chromeControl(argv) {
  * Commands
  */
 
+
+function parseUrlToKeywordsString(url) {
+    return url.split(/[\.\/\-_]/).filter(s => s && ! /https?:/.test(s)).join(' ')
+}
+
+// for more Chrome API refer https://medium.com/@bit2pixel/how-i-navigate-hundreds-of-tabs-on-chrome-with-jxa-and-alfred-9bbf971af02b
+// for how to access the doc
+function getAllBookmarks(folders, items) {
+    if (!folders) { return }
+    folders.forEach(folder => {
+        let folderName = folder.name()
+        getAllBookmarks(folder.bookmarkFolders(), items)
+        folder.bookmarkItems().forEach(bookmark => {
+            let title = bookmark.title()
+            let url = bookmark.url()
+            let key = `${folderName} ${title} ${parseUrlToKeywordsString(url)}`
+            items.push({
+                'folder': folderName,
+                'title': key,
+                'subtitle': url,
+                'arg': url,
+            })
+        })
+    })
+}
+
+// https://stevebarbera.medium.com/automating-chrome-with-jxa-javascript-application-scripting-6f9bc433216a
+function open(url) {
+    // let firstWindow = chrome.windows
+    if (chrome.windows().length < 1) {
+        chrome.windows().make();
+    }
+    let activeWindow = chrome.windows()[0]
+    chrome.windows().forEach(w => {
+        if (w.visible === true) {
+            activeWindow = w
+        }
+    })
+    
+    let newTab = new chrome.Tab()
+    newTab.url = url
+    activeWindow.tabs.push(newTab)
+}
+
+function bookmarks() {
+    let items = []
+    getAllBookmarks(chrome.bookmarkFolders(), items)
+    // can be viewed by
+    // ./chrome.js bookmarks | jq
+
+    out = { 'items': items }
+
+    // Print output
+    println(JSON.stringify(out))
+}
+
 // List all open tabs
 function list() {
     // Iterate all tabs in all windows
@@ -103,12 +163,12 @@ function list() {
 
     var titleToUrl = {}
     for (var winIdx = 0; winIdx < allTabsTitle.length; winIdx++) {
-        for (var tabIdx = 0; tabIdx < allTabsTitle[winIdx].length; tabIdx ++) {
+        for (var tabIdx = 0; tabIdx < allTabsTitle[winIdx].length; tabIdx++) {
             let title = allTabsTitle[winIdx][tabIdx]
             let url = allTabsUrls[winIdx][tabIdx]
 
             titleToUrl[title] = {
-                'title': title + " " + url.split(/[\.\/\-_]/).filter(s=> s && ! /https?:/.test(s)).join(' '),
+                'title': `${title} ${parseUrlToKeywordsString(url)}`,
                 'url': url,
                 'winIdx': winIdx,
                 'tabIdx': tabIdx,
