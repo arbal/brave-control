@@ -1,8 +1,8 @@
 #!/usr/bin/env osascript -l JavaScript
 
 /**
- * A JXA script and an Alfred Workflow for controlling Google Chrome (Javascript for Automation). 
- * Also see my "How I Navigate Hundreds of Tabs on Chrome with JXA and Alfred" article at [1]
+ * A JXA script and an Alfred Workflow for controlling Brave Browser (Javascript for Automation). 
+ * Also see my "How I Navigate Hundreds of Tabs on Brave with JXA and Alfred" article at [1]
  * if you're interested in learning how I created the workflow.
  * [1] https://medium.com/@bit2pixel/how-i-navigate-hundreds-of-tabs-on-chrome-with-jxa-and-alfred-9bbf971af02b  
  */
@@ -10,32 +10,32 @@
 ObjC.import('stdlib')
 ObjC.import('Foundation')
 
-const chrome = Application('Google Chrome')
-chrome.includeStandardAdditions = true
+const brave = Application('Brave Browser')
+brave.includeStandardAdditions = true
 
 // Mode flags
 const MODE_CLI = 0    // Ask questions in command line
-const MODE_UI = 1     // Ask questions with Chrome dialogs
+const MODE_UI = 1     // Ask questions with Brave dialogs
 const MODE_YES = 2    // Answer all questions with `yes`
 let MODE = MODE_CLI   // Default mode is command line
 
 // Print the usage message
 function usage() {
     println('\n--------------')
-    println('Chrome Control')
+    println('Brave Control')
     println('--------------\n')
-    println('list                        List all open tabs in all Chrome windows          usage: ./chrome.js list')
-    println('dedup                       Close duplicate tabs                              usage: ./chrome.js dedup')
-    println('close <winIdx,tabIdx>       Close a specific tab in a specific window         usage: ./chrome.js close 0,13')
-    println('close --title <string(s)>   Close all tabs with titles containing strings     usage: ./chrome.js close --title Inbox "iphone - apple"')
-    println('close --url <string(s)>     Close all tabs with URLs containing strings       usage: ./chrome.js close --url mail.google apple')
-    println('focus <winIdx,tabIdx>       Focus on a specific tab in a specific window      usage: ./chrome.js focus 0,13')
-    println('--ui                        If set, use Chrome to show messages               usage  ./chrome.js close --title inbox --ui')
-    println('--yes                       If set, all questions will be anwered with "y"    usage  ./chrome.js close --title inbox --yes')
+    println('list                        List all open tabs in all Brave windows          usage: ./brave.js list')
+    println('dedup                       Close duplicate tabs                              usage: ./brave.js dedup')
+    println('close <winIdx,tabIdx>       Close a specific tab in a specific window         usage: ./brave.js close 0,13')
+    println('close --title <string(s)>   Close all tabs with titles containing strings     usage: ./brave.js close --title Inbox "iphone - apple"')
+    println('close --url <string(s)>     Close all tabs with URLs containing strings       usage: ./brave.js close --url mail.google apple')
+    println('focus <winIdx,tabIdx>       Focus on a specific tab in a specific window      usage: ./brave.js focus 0,13')
+    println('--ui                        If set, use Brave to show messages               usage  ./brave.js close --title inbox --ui')
+    println('--yes                       If set, all questions will be anwered with "y"    usage  ./brave.js close --title inbox --yes')
     $.exit(1)
 }
 
-// Run Chrome Control and catch all exceptions
+// Run Brave Control and catch all exceptions
 function run(argv) {
     try {
         chromeControl(argv)
@@ -44,12 +44,12 @@ function run(argv) {
     }
 }
 
-// Chrome Control
+// Brave Control
 function chromeControl(argv) {
     if (argv.length < 1) { usage() }
 
     // --ui flag will cause the questions to be asked using a 
-    // Chrome dialog instead of text in command line.
+    // Brave dialog instead of text in command line.
     let uiFlagIdx = argv.indexOf('--ui')
     if (uiFlagIdx > -1) {
         MODE = MODE_UI
@@ -103,7 +103,7 @@ function parseUrlToKeywordsString(url) {
     return url.split(/[\.\/\-_]/).filter(s => s && ! /https?:/.test(s)).join(' ')
 }
 
-// for more Chrome API refer https://medium.com/@bit2pixel/how-i-navigate-hundreds-of-tabs-on-chrome-with-jxa-and-alfred-9bbf971af02b
+// for more Brave API refer https://medium.com/@bit2pixel/how-i-navigate-hundreds-of-tabs-on-chrome-with-jxa-and-alfred-9bbf971af02b
 // for how to access the doc
 function getAllBookmarks(folders, items) {
     if (!folders) { return }
@@ -126,27 +126,27 @@ function getAllBookmarks(folders, items) {
 
 // https://stevebarbera.medium.com/automating-chrome-with-jxa-javascript-application-scripting-6f9bc433216a
 function open(url) {
-    // let firstWindow = chrome.windows
-    if (chrome.windows().length < 1) {
-        chrome.windows().make();
+    // let firstWindow = brave.windows
+    if (brave.windows().length < 1) {
+        brave.windows().make();
     }
-    let activeWindow = chrome.windows()[0]
-    chrome.windows().forEach(w => {
+    let activeWindow = brave.windows()[0]
+    brave.windows().forEach(w => {
         if (w.visible === true) {
             activeWindow = w
         }
     })
     
-    let newTab = new chrome.Tab()
+    let newTab = new brave.Tab()
     newTab.url = url
     activeWindow.tabs.push(newTab)
 }
 
 function bookmarks() {
     let items = []
-    getAllBookmarks(chrome.bookmarkFolders(), items)
+    getAllBookmarks(brave.bookmarkFolders(), items)
     // can be viewed by
-    // ./chrome.js bookmarks | jq
+    // ./brave.js bookmarks | jq
 
     out = { 'items': items }
 
@@ -158,8 +158,8 @@ function bookmarks() {
 function list() {
     // Iterate all tabs in all windows
     // Double entries arrays matching windows/tabs indexes (Using this improves a lot the performances)
-    let allTabsTitle = chrome.windows.tabs.title()
-    let allTabsUrls = chrome.windows.tabs.url()
+    let allTabsTitle = brave.windows.tabs.title()
+    let allTabsUrls = brave.windows.tabs.url()
 
     var titleToUrl = {}
     for (var winIdx = 0; winIdx < allTabsTitle.length; winIdx++) {
@@ -194,7 +194,7 @@ function list() {
 function closeTab(arg) {
     let { winIdx, tabIdx } = parseWinTabIdx(arg)
 
-    let tabToClose = chrome.windows[winIdx].tabs[tabIdx]
+    let tabToClose = brave.windows[winIdx].tabs[tabIdx]
 
     // Ask the user before closing tab
     areYouSure([tabToClose], 'Close this tab?', 'Couldn\'t find any matching tabs')
@@ -217,7 +217,7 @@ function closeByKeyword(cmd, keywords) {
 
     // Iterate all tabs in all windows and compare the property returned
     // by `getProperty` to the given keywords
-    chrome.windows().forEach(window => {
+    brave.windows().forEach(window => {
         window.tabs().forEach(tab => {
             keywords.forEach(keyword => {
                 if (getProperty(tab).toLowerCase().includes(keyword.toLowerCase())) {
@@ -237,10 +237,10 @@ function closeByKeyword(cmd, keywords) {
 // Focus on a specific tab
 function focus(arg) {
     let { winIdx, tabIdx } = parseWinTabIdx(arg)
-    chrome.windows[winIdx].visible = true
-    chrome.windows[winIdx].activeTabIndex = tabIdx + 1 // Focous on tab
-    chrome.windows[winIdx].index = 1 // Focus on this specific Chrome window
-    chrome.activate()
+    brave.windows[winIdx].visible = true
+    brave.windows[winIdx].activeTabIndex = tabIdx + 1 // Focous on tab
+    brave.windows[winIdx].index = 1 // Focus on this specific Brave window
+    brave.activate()
 }
 
 // Close duplicate tabs
@@ -248,7 +248,7 @@ function dedup() {
     let urls = {}
     let dups = []
 
-    chrome.windows().forEach(window => {
+    brave.windows().forEach(window => {
         window.tabs().forEach(tab => {
             const url = tab.url();
             if (urls[url] === undefined) {
@@ -270,13 +270,13 @@ function dedup() {
  * Helpers
  */
 
-// Show a message box in Chrome
+// Show a message box in Brave
 const alert = function (msg) {
     if (MODE === MODE_YES) {
         return
     }
-    chrome.activate()
-    chrome.displayAlert(msg)
+    brave.activate()
+    brave.displayAlert(msg)
 }
 
 // Grab input from the command line and return it
@@ -284,8 +284,8 @@ const prompt = function (msg) {
     if (MODE === MODE_YES) {
         return 'y'
     } else if (MODE === MODE_UI) {
-        chrome.activate()
-        chrome.displayDialog(msg)
+        brave.activate()
+        brave.displayDialog(msg)
         return
     }
     println(`\n${msg} (y/N)`)
@@ -327,7 +327,7 @@ function areYouSure(tabsToClose, promptMsg, emptyMsg) {
         titles.push(tab.title())
     })
 
-    // Focus on Chrome and ask user if they really want to close these tabs
+    // Focus on Brave and ask user if they really want to close these tabs
     if (MODE == MODE_CLI) {
         println(`\n${titles.join('\n\n')}`)
         if (prompt(promptMsg) !== 'y') {
