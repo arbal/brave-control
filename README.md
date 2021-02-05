@@ -1,3 +1,27 @@
+# About This Fork
+
+Forked from [bit2pixel/chrome-control](https://github.com/bit2pixel/chrome-control) because the original repo isn't seem to be active any more, with these changes,
+
+1. Apply performace patch from [bit2pixel/chrome-control/pull/7](https://github.com/bit2pixel/chrome-control/pull/7/)
+2. Disable prompt for "Are you sure" for duplication removal
+3. Search keyword in both title and url
+    - for example `[Hello World](https://exampledomain.com/hw)` can he searched by either `hello`, `world`, `hw` or `exampledomain`.
+4. New feature to search for bookmarks. Command is `b`
+5. Change command for Tabs searching to `t`
+
+
+## How To Install
+
+```sh
+git clone https://github.com/d4rkb1ue/chrome-control.git
+./install.sh
+```
+
+Or just download and double click,
+- https://github.com/d4rkb1ue/chrome-control/raw/master/integrations/Alfred/Chrome%20Control.alfredworkflow
+
+
+
 Chrome Control
 ==============
 
