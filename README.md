@@ -1,33 +1,65 @@
 # About This Fork
 
-Forked from [bit2pixel/chrome-control](https://github.com/bit2pixel/chrome-control) because the original repo isn't seem to be active any more, with these changes,
+Forked from [d4rkb1ue/chrome-control](https://github.com/d4rkb1ue/chrome-control) to make an equivalent command line utility for [Brave Browser](https://github.com/brave/brave-browser). Predicably, it is named [brave-control](https://github.com/arbal/brave-control) and the script is named [brave.js](https://github.com/arbal/brave-control/blob/master/brave.js).
 
-1. Apply performace patch from [bit2pixel/chrome-control/pull/7](https://github.com/bit2pixel/chrome-control/pull/7/)
-2. Disable prompt for "Are you sure" for duplication removal
-3. Search keyword in both title and url
-    - for example `[Hello World](https://exampledomain.com/hw)` can he searched by either `hello`, `world`, `hw` or `exampledomain`.
-4. New feature to search for bookmarks. Command is `b`
-5. Change command for Tabs searching to `t`
+### Commands used for curious readers:
+
+1. Modify code & comments. Commit.
+
+```sh
+perl -pi -e 's/chrome([^\w-])/brave$1/g' ./chrome.js
+perl -pi -e 's/Google Chrome/Brave Browser/g' ./chrome.js
+perl -pi -e 's/Chrome/Brave/g' ./chrome.js
+
+git add ./chrome.js && git commit -m 'Modified chrome.js to use Brave Browser' && git push
+```
+
+#### **NOTE: In order to preserve history, it is important to commit any file rename operations separately from any file content changes**
+
+2. Use [git-mv](https://git-scm.com/docs/git-mv) to rename script. Commit.
+
+```sh
+git mv -v ./chrome.js ./brave.js
+git commit -m 'Renamed chrome.js to brave.js' && git push
+```
+
+3. Use [hub](https://hub.github.com/) to rename this repo. Described in [github/hub#390](https://github.com/github/hub/issues/390#issuecomment-457858483).
+
+```sh
+hub api -XPATCH repos/arbal/chrome-control -f name=brave-control
+git remote set-url origin https://github.com/arbal/brave-control.git
+```
+
+#### Notes from earlier [d4rkb1ue/archrome-control](https://github.com/d4rkb1ue/chrome-control) fork:
+
+> Forked from [bit2pixel/chrome-control](https://github.com/bit2pixel/chrome-control) because the original repo isn't seem to be active any more, with these changes,
+
+> 1. Apply performace patch from [bit2pixel/chrome-control/pull/7](https://github.com/bit2pixel/chrome-control/pull/7/)
+> 2. Disable prompt for "Are you sure" for duplication removal
+> 3. Search keyword in both title and url
+>     - for example `[Hello World](https://exampledomain.com/hw)` can he searched by either `hello`, `world`, `hw` or `exampledomain`.
+> 4. New feature to search for bookmarks. Command is `b`
+> 5. Change command for Tabs searching to `t`
 
 
 ## How To Install
 
 ```sh
-git clone https://github.com/d4rkb1ue/chrome-control.git
+git clone https://github.com/arbal/brave-control.git
 ./install.sh
 ```
 
 Or just download and double click,
-- https://github.com/d4rkb1ue/chrome-control/raw/master/integrations/Alfred/Chrome%20Control.alfredworkflow
+- https://github.com/d4rkb1ue/chrome-control/raw/master/integrations/Alfred/Brave%20Control.alfredworkflow
 
 
 
-Chrome Control
+Brave Control
 ==============
 
-![Chrome Control](img/banner.png)
+![Brave Control](img/banner.png)
 
-A JXA script and an Alfred Workflow for controlling Google Chrome
+A JXA script and an Alfred Workflow for controlling Brave Browser
 (Javascript for Automation). Also see my [How I Navigate Hundreds of Tabs on Chrome with JXA and Alfred](https://medium.com/@bit2pixel/how-i-navigate-hundreds-of-tabs-on-chrome-with-jxa-and-alfred-9bbf971af02b) article if you're interested in learning how I created the workflow.
 
 Usage
@@ -35,29 +67,29 @@ Usage
 
 Make this file an executable
 ```sh
-chmod +x ./chrome.js
+chmod +x ./brave.js
 ```
 
-Then run: 
+Then run:
 ```sh
-./chrome.js
+./brave.js
 ```
 
 
-> MacOS will ask you to allow permissions for this tool to control Chrome.  
+> MacOS will ask you to allow permissions for this tool to control Brave.
 > Feel free to inspect the code before accepting.
 
 Integration
 -----------
 
-You can use `chrome-control` to create fun integrations with your favorite tools (Alfred, vim, vscode, iterm2, ...).
+You can use `brave-control` to create fun integrations with your favorite tools (Alfred, vim, vscode, iterm2, ...).
 
 ### Alfred
 
-I've created an Alfred Workflow to use Chrome Control.
+I've created an Alfred Workflow to use Brave Control.
 You can find it under the intergrations directory.
 
-Alfred Chrome Control commands:
+Alfred Brave Control commands:
   - `tabs`: Lists all tabs
   - `close url <keywords>`: Close tabs with URLs matching these keywords
   - `close title <keywords>`: Close tabs with titles matching these keywords
@@ -72,41 +104,41 @@ Commands
 ### Close duplicate tabs
 
 ```sh
-./chrome.js dedup
+./brave.js dedup
 ```
 
 
-### Close all tabs by `titles` containing strings 
+### Close all tabs by `titles` containing strings
 > Strings are separated by spaces and `case insensitive`.
 
 ```sh
-./chrome.js close --title "inbox" "iphone - apple"
+./brave.js close --title "inbox" "iphone - apple"
 ```
 
 ```sh
-./chrome.js close --title inbox iphone
+./brave.js close --title inbox iphone
 ```
 
 ### Close all tabs by `URLs` containing strings
 > Strings are separated by spaces and `case insensitive`.
 
 ```sh
-./chrome.js close --url "mail.google" "apple"
+./brave.js close --url "mail.google" "apple"
 ```
 
 ```sh
-./chrome.js close --url google apple
+./brave.js close --url google apple
 ```
 
-### List all open tabs in all Chrome windows
+### List all open tabs in all Brave windows
 
 ```sh
-./chrome.js list
+./brave.js list
 ```
 
 The output is `JSON`, so you can pipe it to `jq`.
 ```sh
-./chrome.js list | jq .
+./brave.js list | jq .
 ```
 
 Returns a struct like this:
@@ -141,20 +173,20 @@ Returns a struct like this:
 > `Window Index` and `Tab Index` is the `arg` returned by the `list` command.
 
 ```js
-./chrome.js close 0,13
+./brave.js close 0,13
 ```
 
 
 ### Focus on a specific tab in a specific window
 
 ```js
-./chrome.js focus 0,13
+./brave.js focus 0,13
 ```
 
 ### Show help
 
 ```sh
-./chrome.js 
+./brave.js
 ```
 
 ### Don't prompt the user
@@ -163,12 +195,12 @@ Returns a struct like this:
 
 > Attention: Use this with caution. Make sure you don't have any unsaved work, emails, ... etc.
 
-### Prompt user in Chrome
+### Prompt user in Brave
 
-`--ui` flag will cause the questions to be asked using a Chrome dialog instead of text in command line.
+`--ui` flag will cause the questions to be asked using a Brave dialog instead of text in command line.
 
 ```sh
-./chrome.js close --url apple --ui
+./brave.js close --url apple --ui
 ```
 
 ![Dialog](img/ui.png)
