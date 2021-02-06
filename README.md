@@ -14,7 +14,7 @@ perl -pi -e 's/Chrome/Brave/g' ./chrome.js
 git add ./chrome.js && git commit -m 'Modified chrome.js to use Brave Browser' && git push
 ```
 
-#### **NOTE: In order to preserve history, it is important to commit any file rename operations separately from any file content changes**
+#### **NOTE: In order to preserve history, it is important to commit any file rename operations separately from any file content changes.**
 
 2. Use [git-mv](https://git-scm.com/docs/git-mv) to rename script. Commit.
 
