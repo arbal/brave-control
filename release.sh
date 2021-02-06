@@ -1,1 +1,5 @@
-zip -r integrations/Alfred/Chrome\ Control.alfredworkflow ./chrome.js -x '.*'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+zip -r integrations/Alfred/Brave\ Control.alfredworkflow ./brave.js -x '.*'

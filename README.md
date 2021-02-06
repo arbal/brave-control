@@ -50,7 +50,7 @@ git clone https://github.com/arbal/brave-control.git
 ```
 
 Or just download and double click,
-- https://github.com/d4rkb1ue/chrome-control/raw/master/integrations/Alfred/Brave%20Control.alfredworkflow
+- [Brave Control.alfredworkflow](https://github.com/arbal/brave-control/raw/master/integrations/Alfred/Brave%20Control.alfredworkflow)
 
 
 
