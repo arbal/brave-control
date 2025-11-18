@@ -691,16 +691,33 @@ function runAppleScript(script) {
     }
 }
 
+// Escape a string for safe use in AppleScript string literals
+// Protects against command injection when embedding user-controlled content
+function escapeAppleScriptString(str) {
+    if (typeof str !== 'string') {
+        str = String(str);
+    }
+
+    return str
+        .replace(/\\/g, '\\\\')     // Backslashes must be escaped first
+        .replace(/"/g, '\\"')        // Double quotes
+        .replace(/\n/g, '\\n')       // Newlines
+        .replace(/\r/g, '\\r')       // Carriage returns
+        .replace(/\t/g, '\\t');      // Tabs
+    // Note: Backticks are not special in AppleScript strings, unlike bash
+}
+
 // Show a message box in browser
 function alert(msg) {
     if (MODE === MODE_YES) {
         return;
     }
     try {
+        const escapedMsg = escapeAppleScriptString(msg);
         runAppleScript(`
             tell application "${BROWSER_APP_NAME}"
                 activate
-                display alert "${msg.replace(/"/g, '\\"')}"
+                display alert "${escapedMsg}"
             end tell
         `);
     } catch (e) {
@@ -715,10 +732,11 @@ function prompt(msg) {
         return 'y';
     } else if (MODE === MODE_UI) {
         try {
+            const escapedMsg = escapeAppleScriptString(msg);
             const result = runAppleScript(`
                 tell application "${BROWSER_APP_NAME}"
                     activate
-                    display dialog "${msg.replace(/"/g, '\\"')}" buttons {"Cancel", "OK"} default button "Cancel"
+                    display dialog "${escapedMsg}" buttons {"Cancel", "OK"} default button "Cancel"
                     set theButton to button returned of result
                     return theButton
                 end tell
